@@ -12,7 +12,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 
 /**
@@ -29,7 +28,6 @@ public class LoadScene {
     private MouseMove mouseMove = new MouseMove();
     private boolean load = false;
     private MouseClick mouseClick = new MouseClick();
-    private AudioClip audioClip = GameUtil.soundPlay("sounds/bgm.wav");
 
     public void init(Stage stage) {
         for (int i = 1; i < 105; i++) {
@@ -44,16 +42,15 @@ public class LoadScene {
 
     private void paint() {
         if(count >= images.length-1) {
-            if (!audioClip.isPlaying())
-                audioClip.play();
+            if (!Director.bgm.isPlaying())
+                Director.bgm.play();
             load = true;
             return;
         }
         if (count == 18){
-            audioClip.play();
+            Director.bgm.play();
         }
-        graphicsContext.drawImage(images[count], 0, 0);
-        count ++;
+        graphicsContext.drawImage(images[count++], 10, 0);
     }
 
 
@@ -74,9 +71,9 @@ public class LoadScene {
         public void handle(MouseEvent event) {
             if (load) {
                 if (GameUtil.ifRect((int) event.getX(),(int) event.getY(),326,540,484,569)){
-                    graphicsContext.drawImage(images[103],0,0);
+                    graphicsContext.drawImage(images[103],10,0);
                 }else {
-                    graphicsContext.drawImage(images[102],0,0);
+                    graphicsContext.drawImage(images[102],10,0);
                 }
             }
         }
@@ -89,6 +86,9 @@ public class LoadScene {
         public void handle(MouseEvent event) {
             if (load) {
                 if (GameUtil.ifRect((int) event.getX(),(int) event.getY(),326,540,484,569)){
+                    AudioClip bgm0 = GameUtil.soundPlay("sounds/bgm0.wav");
+                    bgm0.setVolume(2);
+                    bgm0.play();
                     Director.getInstance().toMenu();
                 }
             }
@@ -97,7 +97,6 @@ public class LoadScene {
 
     public void clear(Stage stage){
         refresh.stop();
-        audioClip.stop();
         stage.getScene().removeEventHandler(MouseEvent.MOUSE_CLICKED,mouseClick);
         stage.getScene().removeEventHandler(MouseEvent.MOUSE_MOVED,mouseMove);
     }

@@ -1,9 +1,12 @@
 package com.biyixia;
 
 import com.biyixia.scene.LoadScene;
+import com.biyixia.scene.MenuScene;
+import com.biyixia.utils.GameUtil;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 
 /**
@@ -15,7 +18,9 @@ public class Director {
     private Director(){}
     private static Director instance = new Director();
     private Stage stage;
+    public static AudioClip bgm = GameUtil.soundPlay("sounds/bgm.wav");
     LoadScene loadScene = new LoadScene();
+    MenuScene menuScene = new MenuScene();
 
     public static Director getInstance(){
         return instance;
@@ -38,12 +43,13 @@ public class Director {
     }
 
     public void toMenu(){
-//        menoScene.init(stage);
         loadScene.clear(stage);
+        menuScene.init(stage);
     }
 
-    public void gameStart(){
-
+    public void toStartAdventure(){
+        menuScene.clear(stage);
+//        adventrue.init(stage);
     }
 
     public void gemeOver(){
