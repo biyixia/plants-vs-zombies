@@ -1,3 +1,6 @@
+package com.biyixia;
+
+import com.biyixia.Director;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
