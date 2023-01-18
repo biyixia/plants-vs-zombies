@@ -25,8 +25,8 @@ public class MenuScene {
     private long lastupdate = 0;
     private Refresh refresh = new Refresh();
     private AudioClip bgm4 = GameUtil.soundPlay("sounds/bgm4.wav");
-    private MouseMove mouseMove = new MouseMove();
-    private MouseClick mouseClick = new MouseClick();
+    private final MouseMove mouseMove = new MouseMove();
+    private final MouseClick mouseClick = new MouseClick();
     private boolean tips = false;
 
     public void init(Stage stage){
@@ -42,8 +42,8 @@ public class MenuScene {
     public void clear(Stage stage){
         refresh.stop();
         Director.bgm.stop();
-        stage.getScene().removeEventHandler(MouseEvent.MOUSE_MOVED,mouseMove);
-        stage.getScene().removeEventHandler(MouseEvent.MOUSE_CLICKED,mouseClick);
+        stage.getScene().setOnMouseClicked(null);
+        stage.getScene().setOnMouseMoved(null);
     }
     private void paint(){
         if (!Director.bgm.isPlaying()){
@@ -141,7 +141,6 @@ public class MenuScene {
         @Override
         public void handle(MouseEvent event) {
             if(GameUtil.ifRect((int) event.getX(),(int) event.getY(),46,440,143,570)) {//成就
-
             }
             else if(GameUtil.ifRect((int) event.getX(),(int) event.getY(),269,500,323,543)){//花园
 

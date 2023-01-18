@@ -2,6 +2,7 @@ package com.biyixia;
 
 import com.biyixia.scene.LoadScene;
 import com.biyixia.scene.MenuScene;
+import com.biyixia.scene.StartAdventure;
 import com.biyixia.utils.GameUtil;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -19,8 +20,9 @@ public class Director {
     private static Director instance = new Director();
     private Stage stage;
     public static AudioClip bgm = GameUtil.soundPlay("sounds/bgm.wav");
-    LoadScene loadScene = new LoadScene();
-    MenuScene menuScene = new MenuScene();
+    private LoadScene loadScene = new LoadScene();
+    private MenuScene menuScene = new MenuScene();
+    private StartAdventure startAdventure = new StartAdventure();
 
     public static Director getInstance(){
         return instance;
@@ -34,7 +36,7 @@ public class Director {
         stage.setResizable(false);
         stage.setScene(scene);
         this.stage = stage;
-        toLoad();
+        toStartAdventure();
         stage.show();
     }
 
@@ -45,11 +47,12 @@ public class Director {
     public void toMenu(){
         loadScene.clear(stage);
         menuScene.init(stage);
+        startAdventure.clear(stage);
     }
 
     public void toStartAdventure(){
         menuScene.clear(stage);
-//        adventrue.init(stage);
+        startAdventure.init(stage);
     }
 
     public void gemeOver(){
