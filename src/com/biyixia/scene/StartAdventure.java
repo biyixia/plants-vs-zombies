@@ -6,6 +6,7 @@ import com.biyixia.sprite.Glass;
 import com.biyixia.sprite.Shove;
 import com.biyixia.sprite.Sun;
 import com.biyixia.sprite.plants.*;
+import com.biyixia.sprite.zombies.*;
 import com.biyixia.utils.GameUtil;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
@@ -36,13 +37,9 @@ public class StartAdventure {
     private Refresh refresh = new Refresh();
     private long lastUpdate = 0;
     private ArrayList<Car> cars = new ArrayList<>();
-    private ArrayList<Glass> glasses = new ArrayList<>();
+    public static ArrayList<Glass> glasses = new ArrayList<>();
     private HashMap<Glass, Plant> plant = new HashMap<>();
-    private ArrayList<SunFlower> sunFlowers = new ArrayList<>();
-    private ArrayList<WallNut> wallNuts = new ArrayList<>();
-    private ArrayList<PeaShooter> peaShooters = new ArrayList<>();
-    private ArrayList<SnowPea> snowPeas = new ArrayList<>();
-
+    private ArrayList<ZOMBIE> zombies = new ArrayList<>();
     private Sun sun = null;
     private Shove shove = null;
     private static final int CARD_X = 137, CARD_Y = 17, CARD_SPACE = 52;
@@ -58,6 +55,7 @@ public class StartAdventure {
 
     private static boolean game = false;
     private static boolean gameDefeat = false;
+    private static int num = 0;
 
     public void init(Stage stage) {
         game = true;
@@ -148,19 +146,76 @@ public class StartAdventure {
                 Sun.live = true;
                 sun = new Sun((int) (Math.random() * 680) + 70, (int) (Math.random() * 500) + 50, 50.0, 50);
             }
+            if (interval >= 10) {//40秒后第一波攻势来袭
+                if (num >= 0 && num <= 5) {
+                    if ((interval >= ((int) (Math.random() * 10) + 10) && interval <20)) {
+                        zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 6, 10, 100));
+                    }
+                    if(interval == 15){
+                        for (ZOMBIE zombie : zombies) {
+                            zombie.setHp(-1);
+                        }
+                    }
+                } else if (num > 5 && num <= 25) {
+                    if (interval >= ((int) (Math.random() * 5) + 30)) {
+                        int x = (int) (Math.random() * 16);
+                        if (x < 5 && x >= 0) {
+                            zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 1, 20, 100));
+                        } else if (x >= 5 && x < 11) {
+                            zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                        } else if (x >= 11 && x < 14) {
+                            zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                        } else {
+                            zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                        }
+                    }
+                } else if (num > 25 && num <= 50) {
+                    if (interval >= ((int) (Math.random() * 5) + 40)) {
+                        for (int i = 0; i < 2; i++) {//一下产生两只僵尸
+                            int x = (int) (Math.random() * 16);
+                            if (x < 4 && x >= 0) {
+                                zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 1, 20, 100));
+                            } else if (x >= 4 && x < 11) {
+                                zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                            } else if (x >= 11 && x < 14) {
+                                zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                            } else {
+                                zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                            }
+                        }
+                    }
+                } else if (num > 50) {
+                    if (interval >= 10 + ((int) (Math.random() * 5))) {
+                        for (int i = 0; i < 2; i++) {
+                            int x = (int) (Math.random() * 16);
+                            if (x < 3 && x >= 0) {
+                                zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 1, 20, 100));
+                            } else if (x >= 3 && x < 9) {
+                                zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                            } else if (x >= 9 && x < 14) {
+                                zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                            } else {
+                                zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
+                            }
+                        }
+                    }
+                }
+            }
         }
-        //画太阳
-        if (Sun.live) {
-            sun.paint(graphicsContext);
-        }
-
         //画四种植物
         Collection<Plant> values = plant.values();
         for (Plant value : values) {
             value.paint(graphicsContext);
         }
 
+        for (ZOMBIE zombie : zombies) {
+            zombie.paint(graphicsContext);
+        }
 
+        //画太阳
+        if (Sun.live) {
+            sun.paint(graphicsContext);
+        }
         //画点击卡片后的附着效果
         if (SunFlower.move) {
             graphicsContext.drawImage(SunFlower.cards[0], x - SunFlower.cards[0].getWidth() / 2, y - SunFlower.cards[0].getHeight() / 2);
@@ -263,14 +318,14 @@ public class StartAdventure {
                         if (SunFlower.move) {
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             money -= SunFlower.PRICE;
-                            plant.put(glass,new SunFlower(glass.getX(), glass.getY(), 73, 74));
+                            plant.put(glass, new SunFlower(glass.getX(), glass.getY(), 73, 74));
                             SunFlower.move = false;
                             glass.live = true;
                         }
                         if (SnowPea.move) {
                             SnowPea.move = false;
                             money -= SnowPea.PRICE;
-                            plant.put(glass,new SnowPea(glass.getX(), glass.getY(), 73, 74));
+                            plant.put(glass, new SnowPea(glass.getX(), glass.getY(), 73, 74));
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             glass.live = true;
 
@@ -278,7 +333,7 @@ public class StartAdventure {
                         if (PeaShooter.move) {
                             PeaShooter.move = false;
                             money -= PeaShooter.PRICE;
-                            plant.put(glass,new PeaShooter(glass.getX(), glass.getY(), 73, 74));
+                            plant.put(glass, new PeaShooter(glass.getX(), glass.getY(), 73, 74));
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             glass.live = true;
 
@@ -286,14 +341,14 @@ public class StartAdventure {
                         if (WallNut.move) {
                             WallNut.move = false;
                             money -= WallNut.PRICE;
-                            plant.put(glass,new WallNut(glass.getX(), glass.getY(), 73, 74));
+                            plant.put(glass, new WallNut(glass.getX(), glass.getY(), 73, 74));
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             glass.live = true;
                         }
                         move = false;
                     }
                     if (glass.live && GameUtil.ifRect(event.getX(), event.getY(), glass.getX(),
-                            glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())){
+                            glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())) {
                         if (Shove.move) {
                             Shove.move = false;
                             glass.live = false;

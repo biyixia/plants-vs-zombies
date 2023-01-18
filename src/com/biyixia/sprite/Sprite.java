@@ -11,6 +11,9 @@ public abstract class Sprite {
     protected double width;
     protected double height;
 
+    public Sprite() {
+    }
+
     public Sprite(double x, double y) {
         this.x = x;
         this.y = y;
