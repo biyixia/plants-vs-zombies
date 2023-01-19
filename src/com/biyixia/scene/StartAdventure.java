@@ -16,6 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import java.util.*;
 
 
@@ -25,7 +26,7 @@ import java.util.*;
  */
 public class StartAdventure {
     private Canvas canvas = new Canvas(Director.WIDTH, Director.HEIGHT);
-    private  GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+    private GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
     private final AudioClip bgm8 = GameUtil.soundPlay("sounds/bgm8.wav");
     private final AudioClip defeat = GameUtil.soundPlay("sounds/shibai.wav");
     private final Refresh refresh = new Refresh();
@@ -85,7 +86,7 @@ public class StartAdventure {
         zombies.clear();
         Collection<Plant> values = plants.values();
         Iterator<Plant> iterator = values.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Plant next = iterator.next();
             iterator.remove();
         }
@@ -156,8 +157,8 @@ public class StartAdventure {
             }
             if (interval >= 1) {//40秒后第一波攻势来袭
                 if (num >= 0 && num <= 5) {
-                    if ((interval >= ((int) (Math.random() * 10) + 1) && interval <20)) {
-                        zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 6, 10, 100));
+                    if ((interval >= ((int) (Math.random() * 10) + 10) && interval < 20)) {
+                        zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 6, 10, 200));
                     }
                 } else if (num > 5 && num <= 25) {
                     if (interval >= ((int) (Math.random() * 5) + 30)) {
@@ -212,12 +213,17 @@ public class StartAdventure {
                 value.paint(graphicsContext);
             }
         } catch (ConcurrentModificationException e) {
-            System.out.println("遍历过程中删除");
+            System.out.println("植物在遍历过程中删除");
         }
 
         //画僵尸
-        for (ZOMBIE zombie : zombies) {
+        Iterator<ZOMBIE> iterator = zombies.iterator();
+        while (iterator.hasNext()) {
+            ZOMBIE zombie = iterator.next();
             zombie.paint(graphicsContext);
+            if (!zombie.live){
+                iterator.remove();
+            }
         }
 
         //画子弹
@@ -227,7 +233,7 @@ public class StartAdventure {
 
         //画太阳
         for (Sun sun : suns) {
-            if (sun.live){
+            if (sun.live) {
                 sun.paint(graphicsContext);
             }
         }

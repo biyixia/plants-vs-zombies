@@ -8,26 +8,66 @@ import javafx.scene.image.Image;
  * @create 2023-01-18 19:45
  */
 public class FootballZombie extends ZOMBIE {
-    private static Image[] images = new Image[134];
-    private double speedy;
+    private  int count = 0;
+    private  int max;
+    private static Image[] images = new Image[239];
 
     static {
-        for (int i = 0; i < 134; i++) {
-            images[i] = new Image("images/Zombies/ganlan/ganlan (" + i + ").png");
+        for (int i = 0; i < images.length; i++) {
+            images[i] = new Image("images/Zombies/ganlan/ganlan (" + (i+1) + ").png");
         }
     }
-
+    public FootballZombie(double y){
+        super(y,1,20,200);
+        max = hp;
+    }
     public FootballZombie(double y, double speed, int attack, int hp) {
         super(y, speed, attack, hp);
+        max = hp;
     }
-    @Override
     public void paint(GraphicsContext graphicsContext) {
-//        graphicsContext.drawImage(image,this.x,this.y,this.width,this.height);
-
+        super.paint(graphicsContext);
     }
 
     @Override
-    public void destroy() {
-
+    void walk(GraphicsContext graphicsContext) {
+        if (hp > max / 2) {
+            if (count >= 48) {
+                count = 0;
+            }
+        } else if (hp > 0 && hp <= max / 2) {
+            if (count <= 96 || count >= 143) {
+                count = 96;
+            }
+        }
+        this.setX(getX()-speed);
+        graphicsContext.drawImage(images[count++], this.x, this.y);
     }
+
+    @Override
+    void eat(GraphicsContext graphicsContext) {
+        if (hp > max / 2) {
+            if (count <= 48 || count >= 96) {
+                count = 48;
+            }
+        } else if (hp > 0 && hp <= max / 2) {
+            if (count <= 143 || count >= 191){
+                count = 143;
+            }
+        }
+        graphicsContext.drawImage(images[count++], this.x, this.y);
+    }
+
+    @Override
+    void dead(GraphicsContext graphicsContext) {
+        if (count <= 191){
+            count = 191;
+        }
+        if (count >= 238) {
+            this.live = false;
+            return;
+        }
+        graphicsContext.drawImage(images[count++], this.x, this.y);
+    }
+
 }

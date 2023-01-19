@@ -8,6 +8,8 @@ import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+import java.util.Date;
+
 
 /**
  * @author dbc
@@ -27,8 +29,12 @@ public class SnowBullet extends Bullet {
                 if (zombie.live) {
                     if (GameUtil.ifRect(this.x + image.getWidth(), this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
                         zombie.attacked = true;
-                        zombie.setHp(zombie.getHp()-25);
-                        zombie.setSpeed(zombie.getSpeed()/2);
+                        if (zombie.hurted < 0){
+                            zombie.hurted = 25;
+                        }
+                        if (!zombie.reduceSpeed){
+                            zombie.reduceSpeed = true;
+                        }
                         live = false;
                     }
                 }

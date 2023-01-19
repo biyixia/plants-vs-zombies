@@ -29,7 +29,9 @@ public class Bullet extends Sprite {
                 if (zombie.live) {
                     if (GameUtil.ifRect(this.x + image.getWidth(), this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
                         zombie.attacked = true;
-                        zombie.setHp(zombie.getHp()-25);
+                        if (zombie.hurted < 0){
+                            zombie.hurted = 25;
+                        }
                         live = false;
                     }
                 }

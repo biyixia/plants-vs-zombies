@@ -40,7 +40,6 @@ public class Car extends Sprite{
         }
         work();
     }
-    /* TODO 割草机攻击僵尸 */
     private void work(){
         for (ZOMBIE zombie : StartAdventure.zombies) {
             if (GameUtil.ifRect(this.x, this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
@@ -52,8 +51,10 @@ public class Car extends Sprite{
     private void attack(){
         for (ZOMBIE zombie : StartAdventure.zombies) {
             if (GameUtil.ifRect(this.x, this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
-                live = false;
-                zombie.setHp(-1);
+                zombie.attacked = true;
+                if (zombie.hurted < 0){
+                    zombie.hurted = 9999;
+                }
             }
         }
     }
