@@ -1,10 +1,8 @@
 package com.biyixia.scene;
 
 import com.biyixia.Director;
-import com.biyixia.sprite.Car;
-import com.biyixia.sprite.Glass;
-import com.biyixia.sprite.Shove;
-import com.biyixia.sprite.Sun;
+import com.biyixia.sprite.*;
+import com.biyixia.sprite.bullet.Bullet;
 import com.biyixia.sprite.plants.*;
 import com.biyixia.sprite.zombies.*;
 import com.biyixia.utils.GameUtil;
@@ -18,11 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 
 /**
@@ -30,17 +24,18 @@ import java.util.HashMap;
  * @create 2023-01-16 17:32
  */
 public class StartAdventure {
-    private Canvas canvas = new Canvas(Director.WIDTH, Director.WIDTH);
-    private GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-    private AudioClip bgm8 = GameUtil.soundPlay("sounds/bgm8.wav");
-    private AudioClip defeat = GameUtil.soundPlay("sounds/shibai.wav");
-    private Refresh refresh = new Refresh();
+    private Canvas canvas = new Canvas(Director.WIDTH, Director.HEIGHT);
+    private  GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+    private final AudioClip bgm8 = GameUtil.soundPlay("sounds/bgm8.wav");
+    private final AudioClip defeat = GameUtil.soundPlay("sounds/shibai.wav");
+    private final Refresh refresh = new Refresh();
     private long lastUpdate = 0;
-    private ArrayList<Car> cars = new ArrayList<>();
+    private final ArrayList<Car> cars = new ArrayList<>();
     public static ArrayList<Glass> glasses = new ArrayList<>();
-    private HashMap<Glass, Plant> plant = new HashMap<>();
-    private ArrayList<ZOMBIE> zombies = new ArrayList<>();
-    private Sun sun = null;
+    private HashMap<Glass, Plant> plants = new HashMap<>();
+    public static ArrayList<ZOMBIE> zombies = new ArrayList<>();
+    public static ArrayList<Sun> suns = new ArrayList<>();
+    public static ArrayList<Bullet> bullets = new ArrayList<>();
     private Shove shove = null;
     private static final int CARD_X = 137, CARD_Y = 17, CARD_SPACE = 52;
     private static Date startTime;
@@ -53,7 +48,7 @@ public class StartAdventure {
     private static double x = 0;
     private static double y = 0;
 
-    private static boolean game = false;
+    public static boolean game = false;
     private static boolean gameDefeat = false;
     private static int num = 0;
 
@@ -85,7 +80,20 @@ public class StartAdventure {
     }
 
     public void clear(Stage stage) {
-
+        cars.clear();
+        zombies.clear();
+        Collection<Plant> values = plants.values();
+        Iterator<Plant> iterator = values.iterator();
+        while (iterator.hasNext()){
+            Plant next = iterator.next();
+            iterator.remove();
+        }
+        suns.clear();
+        bullets.clear();
+        interval = 0;
+        num = 0;
+        game = true;
+        gameDefeat = false;
     }
 
     private void paint() {
@@ -142,19 +150,13 @@ public class StartAdventure {
         if ((int) (((stopTime.getTime() - startTime.getTime()) * 0.001)) == interval) {
             System.out.println(interval++);
 //            interval++;
-            if (!Sun.live && interval % 4 == 0) {
-                Sun.live = true;
-                sun = new Sun((int) (Math.random() * 680) + 70, (int) (Math.random() * 500) + 50, 50.0, 50);
+            if (interval % 9 == 0) {
+                suns.add(new Sun((int) (Math.random() * 680) + 70, (int) (Math.random() * 500) + 50, 50.0, 50));
             }
-            if (interval >= 10) {//40秒后第一波攻势来袭
+            if (interval >= 1) {//40秒后第一波攻势来袭
                 if (num >= 0 && num <= 5) {
-                    if ((interval >= ((int) (Math.random() * 10) + 10) && interval <20)) {
+                    if ((interval >= ((int) (Math.random() * 10) + 1) && interval <20)) {
                         zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 6, 10, 100));
-                    }
-                    if(interval == 15){
-                        for (ZOMBIE zombie : zombies) {
-                            zombie.setHp(-1);
-                        }
                     }
                 } else if (num > 5 && num <= 25) {
                     if (interval >= ((int) (Math.random() * 5) + 30)) {
@@ -203,7 +205,7 @@ public class StartAdventure {
             }
         }
         //画四种植物
-        Collection<Plant> values = plant.values();
+        Collection<Plant> values = plants.values();
         for (Plant value : values) {
             value.paint(graphicsContext);
         }
@@ -212,9 +214,16 @@ public class StartAdventure {
             zombie.paint(graphicsContext);
         }
 
+        //画子弹
+        for (Bullet bullet : bullets) {
+            bullet.paint(graphicsContext);
+        }
+
         //画太阳
-        if (Sun.live) {
-            sun.paint(graphicsContext);
+        for (Sun sun : suns) {
+            if (sun.live){
+                sun.paint(graphicsContext);
+            }
         }
         //画点击卡片后的附着效果
         if (SunFlower.move) {
@@ -266,11 +275,13 @@ public class StartAdventure {
             if (!game) {
                 Director.getInstance().toMenu();
             }
-            if (sun != null && GameUtil.ifRect(event.getX(), event.getY(), sun.getX(), sun.getY(), sun.getX() + sun.getWidth(), sun.getY() + sun.getHeight())) {
-                GameUtil.soundPlay("sounds/yangguang.wav").play();
-                Sun.move = true;
-                sun.setSpeedx((sun.getX() - 70) / 30);
-                sun.setSpeedy((sun.getY() - 11) / 30);
+            for (Sun sun : suns) {
+                if (sun.live && GameUtil.ifRect(event.getX(), event.getY(), sun.getX(), sun.getY(), sun.getX() + sun.getWidth(), sun.getY() + sun.getHeight())) {
+                    GameUtil.soundPlay("sounds/yangguang.wav").play();
+                    sun.move = true;
+                    sun.setSpeedx((sun.getX() - 70) / 30);
+                    sun.setSpeedy((sun.getY() - 11) / 30);
+                }
             }
             //点击铲子，铲子移动状态改变
             if (!move) {
@@ -318,14 +329,14 @@ public class StartAdventure {
                         if (SunFlower.move) {
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             money -= SunFlower.PRICE;
-                            plant.put(glass, new SunFlower(glass.getX(), glass.getY(), 73, 74));
+                            plants.put(glass, new SunFlower(glass.getX(), glass.getY(), 73, 74));
                             SunFlower.move = false;
                             glass.live = true;
                         }
                         if (SnowPea.move) {
                             SnowPea.move = false;
                             money -= SnowPea.PRICE;
-                            plant.put(glass, new SnowPea(glass.getX(), glass.getY(), 73, 74));
+                            plants.put(glass, new SnowPea(glass.getX(), glass.getY(), 73, 74));
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             glass.live = true;
 
@@ -333,7 +344,7 @@ public class StartAdventure {
                         if (PeaShooter.move) {
                             PeaShooter.move = false;
                             money -= PeaShooter.PRICE;
-                            plant.put(glass, new PeaShooter(glass.getX(), glass.getY(), 73, 74));
+                            plants.put(glass, new PeaShooter(glass.getX(), glass.getY(), 73, 74));
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             glass.live = true;
 
@@ -341,7 +352,7 @@ public class StartAdventure {
                         if (WallNut.move) {
                             WallNut.move = false;
                             money -= WallNut.PRICE;
-                            plant.put(glass, new WallNut(glass.getX(), glass.getY(), 73, 74));
+                            plants.put(glass, new WallNut(glass.getX(), glass.getY(), 73, 74));
                             GameUtil.soundPlay("sounds/plant.wav").play();
                             glass.live = true;
                         }
@@ -353,7 +364,7 @@ public class StartAdventure {
                             Shove.move = false;
                             glass.live = false;
                             move = false;
-                            plant.remove(glass);
+                            plants.remove(glass);
                         }
                     }
                 }

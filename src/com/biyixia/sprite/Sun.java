@@ -5,15 +5,19 @@ import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+import java.util.Date;
+
 /**
  * @author dbc
  * @create 2023-01-16 17:45
  */
 public class Sun extends Sprite {
-    public static boolean live = false;
+    public  boolean live = true;
     public static final Image[] images = new Image[11];
-    private static int count = 0;
-    public static boolean move = false;
+    private  int count = 0;
+    public  boolean move = false;
+    private Date startTime = new Date();
+    private Date stopTime;
     double speedx, speedy;//阳光被收集后的移动速度
     double maxY;
 
@@ -23,11 +27,12 @@ public class Sun extends Sprite {
         }
     }
 
-    public Sun(double x, double y, int speedx, int speedy) {
-        super(x, 0);
-        this.speedx = speedx;
-        this.speedy = speedy;
-        this.maxY = y;
+    public Sun(double x, double y) {        //太阳花产生太阳的构造方法
+        super(x, y);
+        this.speedx = (this.x - 70) / 30;
+        this.speedy = (y - 11) / 30;
+        this.maxY = 0;
+        this.width = this.height = 50;
     }
 
     public Sun(double x, double y, double width, double height) {
@@ -52,12 +57,19 @@ public class Sun extends Sprite {
                 live = false;
                 move = false;
             }
-        } else {//阳光未被收取
+        }else {//阳光未被收取
             //未降落到最低处
             if (this.y < this.maxY) {
                 this.y += 11;//阳光掉落y值增长
             }
+            if (this.y >= this.maxY){
+                stopTime = new Date();
+                if ((stopTime.getTime() - startTime.getTime())*0.001 >3){
+                    live = false;
+                }
+            }
         }
+
     }
 
     public double getSpeedx() {

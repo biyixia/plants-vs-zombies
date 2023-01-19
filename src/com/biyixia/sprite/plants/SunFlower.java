@@ -1,7 +1,11 @@
 package com.biyixia.sprite.plants;
 
+import com.biyixia.scene.StartAdventure;
+import com.biyixia.sprite.Sun;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+
+import java.util.Date;
 
 
 /**
@@ -14,7 +18,9 @@ public class SunFlower extends Plant {
             new Image("images/GameFrame/back13.png")
     };
     private  int count = 0;
+    private Date startTime = new Date();
     public static final Image[] images = new Image[36];
+    public Sun sun = null;
 
     static {
         for (int i = 0; i < images.length; i++) {
@@ -36,6 +42,14 @@ public class SunFlower extends Plant {
             count = 0;
         }
         graphicsContext.drawImage(images[count++],this.getX(),this.getY());
+        createSun();
+    }
+    private void createSun(){
+        Date stopTime = new Date();
+        if ((stopTime.getTime() - startTime.getTime())*0.001 > 6){
+            StartAdventure.suns.add(new Sun(this.getX(),this.getY()));
+            startTime = new Date();
+        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.biyixia.sprite.Sprite;
 import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
 
 /**
  * @author dbc
@@ -15,7 +16,8 @@ public class FlagZombies extends ZOMBIE {
     private static Image[] images = new Image[134];
     private int count = 0;
     private boolean eat = false;
-    public boolean live = true;
+    private AudioClip bgmAttack = GameUtil.soundPlay("sounds/attack-qizhi.wav");
+
     static {
         for (int i = 0; i < 134; i++) {
             images[i] = new Image("images/Zombies/qizhi/qizhi (" + (i + 1) + ").png");
@@ -35,19 +37,27 @@ public class FlagZombies extends ZOMBIE {
             }else {
                 eat(graphicsContext);
             }
+            if (this.attacked){
+                if (!bgmAttack.isPlaying()) {
+                    bgmAttack.setRate(2);
+                    bgmAttack.play();
+                }
+                this.attacked = false;
+            }
+            eatBrain();
             for (Glass glass : StartAdventure.glasses) {
                 if (glass.live && GameUtil.ifRect(this.getX()+140,this.getY()+100,glass.getX(),glass.getY(),
                         glass.getX()+glass.getWidth(),glass.getY()+glass.getHeight())){
                     eat = true;
-                    return;
+                    break;
                 }else {
                     eat = false;
                 }
             }
         }else {
+            this.live = false;
             dead(graphicsContext);
         }
-
     }
     private void walk(GraphicsContext graphicsContext){
         if (count >= 48) {

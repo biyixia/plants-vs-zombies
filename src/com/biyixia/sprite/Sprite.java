@@ -6,10 +6,10 @@ import javafx.scene.image.Image;
 public abstract class Sprite {
 
     Image image;
-    double x;
-    double y;
-    protected double width;
-    protected double height;
+    public double x;
+    public double y;
+    public double width;
+    public double height;
 
     public Sprite() {
     }

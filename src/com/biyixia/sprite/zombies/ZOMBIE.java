@@ -1,5 +1,6 @@
 package com.biyixia.sprite.zombies;
 
+import com.biyixia.scene.StartAdventure;
 import com.biyixia.sprite.Sprite;
 
 /**
@@ -10,13 +11,24 @@ public class ZOMBIE extends Sprite {
     int attack;
     double speed;
     int hp;
-    public ZOMBIE(double y,double speed, int attack, int hp) {
+    public boolean live = true;
+    public boolean attacked = false;
+
+    public ZOMBIE(double y, double speed, int attack, int hp) {
         super();
         super.setX(800);
         super.setY(y);
         this.speed = speed;
         this.attack = attack;
         this.hp = hp;
+        this.width = 166;
+        this.height = 144;
+    }
+
+    public void eatBrain(){
+        if (this.getX()+this.width<0){
+            StartAdventure.game = false;
+        }
     }
 
     public int getAttack() {

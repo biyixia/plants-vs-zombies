@@ -1,5 +1,7 @@
 package com.biyixia.sprite;
 
+import com.biyixia.scene.StartAdventure;
+import com.biyixia.sprite.zombies.ZOMBIE;
 import com.biyixia.utils.GameUtil;
 import com.sun.xml.internal.bind.v2.TODO;
 import javafx.scene.canvas.GraphicsContext;
@@ -32,11 +34,29 @@ public class Car extends Sprite{
                 bgmCar.play();
                 car = true;
             }
+            attack();
             graphicsContext.drawImage(image, this.x, this.y, this.width, this.height);
             this.x += 15;
         }
+        work();
     }
     /* TODO 割草机攻击僵尸 */
+    private void work(){
+        for (ZOMBIE zombie : StartAdventure.zombies) {
+            if (GameUtil.ifRect(this.x, this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
+                live = false;
+            }
+        }
+    }
+
+    private void attack(){
+        for (ZOMBIE zombie : StartAdventure.zombies) {
+            if (GameUtil.ifRect(this.x, this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
+                live = false;
+                zombie.setHp(-1);
+            }
+        }
+    }
 
     @Override
     public void destroy() {
