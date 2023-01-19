@@ -17,7 +17,7 @@ public class SunFlower extends Plant {
             new Image("images/GameFrame/back12.png"),
             new Image("images/GameFrame/back13.png")
     };
-    private  int count = 0;
+    private int count = 0;
     private Date startTime = new Date();
     public static final Image[] images = new Image[36];
     public Sun sun = null;
@@ -38,22 +38,26 @@ public class SunFlower extends Plant {
 
     @Override
     public void paint(GraphicsContext graphicsContext) {
-        if (count >= images.length){
-            count = 0;
+        if (hp > 0) {
+            if (count >= images.length) {
+                count = 0;
+            }
+            graphicsContext.drawImage(images[count++], this.getX(), this.getY());
+            createSun();
+            if (attacked){
+                attacked = false;
+                hp -= 25;
+            }
+        }else {
+            destroy();
         }
-        graphicsContext.drawImage(images[count++],this.getX(),this.getY());
-        createSun();
     }
-    private void createSun(){
+
+    private void createSun() {
         Date stopTime = new Date();
-        if ((stopTime.getTime() - startTime.getTime())*0.001 > 6){
-            StartAdventure.suns.add(new Sun(this.getX(),this.getY()));
+        if ((stopTime.getTime() - startTime.getTime()) * 0.001 > 6) {
+            StartAdventure.suns.add(new Sun(this.getX(), this.getY()));
             startTime = new Date();
         }
-    }
-
-    @Override
-    public void destroy() {
-
     }
 }

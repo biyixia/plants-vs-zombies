@@ -33,13 +33,21 @@ public class SnowPea extends Plant {
 
     @Override
     public void paint(GraphicsContext graphicsContext) {
-        if (count >= images.length) {
-            count = 0;
-        }
-        graphicsContext.drawImage(images[count++], this.getX(), this.getY());
-        //测试发现，发射子弹频率过快会导致上个子弹爆炸声还没放完，第二个子弹已经爆炸因此产生第二个子弹有伤害没声音的现象
-        if (count == 4){
-            StartAdventure.bullets.add(new SnowBullet(this.getX()+50,this.getY()));
+        if (hp > 0) {
+            if (count >= images.length) {
+                count = 0;
+            }
+            graphicsContext.drawImage(images[count++], this.getX(), this.getY());
+            if (attacked){
+                attacked = false;
+                hp -= 25;
+            }
+            //测试发现，发射子弹频率过快会导致上个子弹爆炸声还没放完，第二个子弹已经爆炸因此产生第二个子弹有伤害没声音的现象
+            if (count == 4){
+                StartAdventure.bullets.add(new SnowBullet(this.getX()+50,this.getY()));
+            }
+        }else {
+            destroy();
         }
     }
 

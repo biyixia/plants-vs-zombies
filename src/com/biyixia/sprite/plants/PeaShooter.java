@@ -31,18 +31,21 @@ public class PeaShooter extends Plant {
 
     @Override
     public void paint(GraphicsContext graphicsContext) {
-        if (count >= images.length) {
-            count = 0;
+        if (hp > 0){
+            if (count >= images.length) {
+                count = 0;
+            }
+            if (attacked){
+                attacked = false;
+                hp -= 25;
+            }
+            //测试发现，发射子弹频率过快会导致上个子弹爆炸声还没放完，第二个子弹已经爆炸因此产生第二个子弹有伤害没声音的现象
+            if (count == 10){
+                StartAdventure.bullets.add(new Bullet(this.getX()+50,this.getY()));
+            }
+            graphicsContext.drawImage(images[count++], this.getX(), this.getY());
+        }else {
+            destroy();
         }
-        //测试发现，发射子弹频率过快会导致上个子弹爆炸声还没放完，第二个子弹已经爆炸因此产生第二个子弹有伤害没声音的现象
-        if (count == 10){
-            StartAdventure.bullets.add(new Bullet(this.getX()+50,this.getY()));
-        }
-        graphicsContext.drawImage(images[count++], this.getX(), this.getY());
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
     }
 }

@@ -32,7 +32,7 @@ public class StartAdventure {
     private long lastUpdate = 0;
     private final ArrayList<Car> cars = new ArrayList<>();
     public static ArrayList<Glass> glasses = new ArrayList<>();
-    private HashMap<Glass, Plant> plants = new HashMap<>();
+    public static HashMap<Glass, Plant> plants = new HashMap<>();
     public static ArrayList<ZOMBIE> zombies = new ArrayList<>();
     public static ArrayList<Sun> suns = new ArrayList<>();
     public static ArrayList<Bullet> bullets = new ArrayList<>();
@@ -80,6 +80,7 @@ public class StartAdventure {
     }
 
     public void clear(Stage stage) {
+        glasses.clear();
         cars.clear();
         zombies.clear();
         Collection<Plant> values = plants.values();
@@ -206,10 +207,15 @@ public class StartAdventure {
         }
         //画四种植物
         Collection<Plant> values = plants.values();
-        for (Plant value : values) {
-            value.paint(graphicsContext);
+        try {
+            for (Plant value : values) {
+                value.paint(graphicsContext);
+            }
+        } catch (ConcurrentModificationException e) {
+            System.out.println("遍历过程中删除");
         }
 
+        //画僵尸
         for (ZOMBIE zombie : zombies) {
             zombie.paint(graphicsContext);
         }

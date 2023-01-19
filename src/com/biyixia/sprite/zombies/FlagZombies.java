@@ -3,6 +3,7 @@ package com.biyixia.sprite.zombies;
 import com.biyixia.scene.StartAdventure;
 import com.biyixia.sprite.Glass;
 import com.biyixia.sprite.Sprite;
+import com.biyixia.sprite.plants.Plant;
 import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -70,6 +71,16 @@ public class FlagZombies extends ZOMBIE {
     private void eat(GraphicsContext graphicsContext){
         if (count<49 || count >= 88){
             count = 49;
+        }
+        if (count == 60){
+            for (Glass glass : StartAdventure.glasses) {
+                if (glass.live && GameUtil.ifRect(this.x+140, this.y+100, glass.getX(),
+                        glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())){
+                    Plant plant = StartAdventure.plants.get(glass);
+                    plant.attacked = true;
+                    break;
+                }
+            }
         }
         graphicsContext.drawImage(images[count], this.getX(), this.getY(),images[count].getWidth(),images[count++].getHeight());
     }
