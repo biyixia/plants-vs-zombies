@@ -36,7 +36,7 @@ public class Director {
         stage.setResizable(false);
         stage.setScene(scene);
         this.stage = stage;
-        toStartAdventure();
+        toLoad();
         stage.show();
     }
 
@@ -53,9 +53,5 @@ public class Director {
     public void toStartAdventure(){
         menuScene.clear(stage);
         startAdventure.init(stage);
-    }
-
-    public void gemeOver(){
-
     }
 }
