@@ -3,11 +3,10 @@ package com.biyixia.sprite.bullet;
 
 import com.biyixia.scene.StartAdventure;
 import com.biyixia.sprite.Sprite;
-import com.biyixia.sprite.zombies.ZOMBIE;
+import com.biyixia.sprite.zombies.Zombie;
 import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.media.AudioClip;
 
 
 /**
@@ -25,11 +24,10 @@ public class Bullet extends Sprite {
             this.x += speed;
             graphicsContext.drawImage(image, this.x, this.y, image.getWidth(), image.getHeight());
 
-            for (ZOMBIE zombie : StartAdventure.zombies) {
+            for (Zombie zombie : StartAdventure.zombies) {
                 if (zombie.live) {
                     if (GameUtil.ifRect(this.x + image.getWidth(), this.y, zombie.getX() + 90, zombie.getY() + 50, zombie.getX() + zombie.getWidth(), zombie.getY() + zombie.getHeight())) {
-                        zombie.attacked = true;
-                        if (zombie.hurted < 0){
+                        if (zombie.hurted < 0) {
                             zombie.hurted = 25;
                         }
                         live = false;
@@ -37,11 +35,6 @@ public class Bullet extends Sprite {
                 }
             }
         }
-    }
-
-    @Override
-    public void destroy() {
-
     }
 
     public Bullet(double x, double y) {

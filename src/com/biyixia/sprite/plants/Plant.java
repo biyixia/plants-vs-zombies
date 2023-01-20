@@ -15,10 +15,29 @@ import java.util.ConcurrentModificationException;
  */
 public abstract class Plant extends Sprite {
     public int hp = 100;
-    public boolean attacked = false;
+    public int hurted = -1;
 
     public Plant(double x, double y, double width, double height) {
         super(x, y, width, height);
+    }
+
+    @Override
+    public void paint(GraphicsContext graphicsContext) {
+        if (hp > 0) {
+            work(graphicsContext);
+            attacked();
+        } else {
+            destroy();
+        }
+    }
+
+    public void work(GraphicsContext graphicsContext){}
+
+    public void attacked(){
+        if (hurted > 0) {
+            hp -= hurted;
+            hurted = -1;
+        }
     }
 
     @Override

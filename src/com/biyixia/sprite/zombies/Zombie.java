@@ -14,9 +14,10 @@ import java.util.Date;
  * @author dbc
  * @create 2023-01-18 19:42
  */
-public class ZOMBIE extends Sprite {
+public class Zombie extends Sprite {
     //攻击力
     int attack;
+    //受到的伤害
     public int hurted = -1;
     //速度
     double speed;
@@ -25,10 +26,9 @@ public class ZOMBIE extends Sprite {
     int hp;
     //生命
     public boolean live = true;
-    //受到攻击
-    public boolean attacked = false;
     //减速
     public boolean reduceSpeed = false;
+    //记录减速持续时间
     public Date startTime,stopTime;
     //吃的状态
     boolean eat = false;
@@ -36,7 +36,7 @@ public class ZOMBIE extends Sprite {
     public  final AudioClip bgmAttack = GameUtil.soundPlay("sounds/attack-qizhi.wav");
 
 
-    public ZOMBIE(double y, double speed, int attack, int hp) {
+    public Zombie(double y, double speed, int attack, int hp) {
         super();
         super.setX(800);
         super.setY(y);
@@ -69,19 +69,30 @@ public class ZOMBIE extends Sprite {
     void eat(GraphicsContext graphicsContext) {
     }
     void dead(GraphicsContext graphicsContext){}
+    //吃身前的植物
+    void attack(){
+        Plant plant = getPlant(this.x + 140, this.y + 100);
+        if (plant != null) {
+            if (hurted <0) {
+                plant.hurted = attack;
+            }
+        }
+    }
     void attacked(){
         attackedBGM(bgmAttack);
     }
+    //僵尸受到攻击
     void attackedBGM(AudioClip audioClip){
-        if (this.attacked && hurted >0) {
+        //受到伤害
+        if (hurted >0) {
             if (!audioClip.isPlaying()) {
                 audioClip.setRate(2);
                 audioClip.play();
             }
-            this.attacked = false;
             hp -= hurted;
             hurted = -1;
         }
+        //受到减速效果
         stopTime = new Date();
         if (this.reduceSpeed){
             startTime = new Date();
@@ -96,6 +107,7 @@ public class ZOMBIE extends Sprite {
             }
         }
     }
+    //获取僵尸身前的植物对象，若没有植物返回null
     Plant getPlant(double x, double y) {
         for (Glass glass : StartAdventure.glasses) {
             if (glass.live && GameUtil.ifRect(x, y, glass.getX(), glass.getY(),
@@ -106,14 +118,10 @@ public class ZOMBIE extends Sprite {
         }
         return null;
     }
+    //僵尸进入房间并吃掉了脑子！
     public void eatBrain() {
         if (this.getX() + this.width < 0) {
             StartAdventure.game = false;
         }
-    }
-    //销毁僵尸对象
-    @Override
-    public void destroy() {
-        StartAdventure.zombies.remove(this);
     }
 }

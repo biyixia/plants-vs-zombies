@@ -1,11 +1,8 @@
 package com.biyixia.sprite;
-import javafx.geometry.Rectangle2D;
+
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 
 public abstract class Sprite {
-
-    Image image;
     public double x;
     public double y;
     public double width;
@@ -24,14 +21,6 @@ public abstract class Sprite {
         this.y = y;
         this.width = width;
         this.height = height;
-    }
-
-    public Image getImage() {
-        return image;
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
     }
 
     public double getX() {
@@ -66,13 +55,8 @@ public abstract class Sprite {
         this.height = height;
     }
 
-    public void paint(GraphicsContext graphicsContext) {
-        graphicsContext.drawImage(image, x, y, width, height);
-    }
+    public abstract void paint(GraphicsContext graphicsContext);
 
-    public Rectangle2D getContour() {
-        return new Rectangle2D(x, y, width, height);
+    public void destroy() {
     }
-
-    public abstract void destroy();
 }

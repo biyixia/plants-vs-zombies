@@ -25,8 +25,8 @@ import java.util.*;
  * @create 2023-01-16 17:32
  */
 public class StartAdventure {
-    private Canvas canvas = new Canvas(Director.WIDTH, Director.HEIGHT);
-    private GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+    private final Canvas canvas = new Canvas(Director.WIDTH, Director.HEIGHT);
+    private final GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
     private final AudioClip bgm8 = GameUtil.soundPlay("sounds/bgm8.wav");
     private final AudioClip defeat = GameUtil.soundPlay("sounds/shibai.wav");
     private final Refresh refresh = new Refresh();
@@ -34,7 +34,7 @@ public class StartAdventure {
     private final ArrayList<Car> cars = new ArrayList<>();
     public static ArrayList<Glass> glasses = new ArrayList<>();
     public static HashMap<Glass, Plant> plants = new HashMap<>();
-    public static ArrayList<ZOMBIE> zombies = new ArrayList<>();
+    public static ArrayList<Zombie> zombies = new ArrayList<>();
     public static ArrayList<Sun> suns = new ArrayList<>();
     public static ArrayList<Bullet> bullets = new ArrayList<>();
     private Shove shove = null;
@@ -42,15 +42,16 @@ public class StartAdventure {
     private static Date startTime;
     private static Date stopTime;
     private static int interval = 0;
-    private MouseClick mouseClick = new MouseClick();
-    private MouseMove mouseMove = new MouseMove();
+    private final MouseClick mouseClick = new MouseClick();
+    private final MouseMove mouseMove = new MouseMove();
     private static boolean move = false;
-    public static int money = 10000;
+    public static int money = 25;
     private static double x = 0;
     private static double y = 0;
 
     public static boolean game = false;
     private static boolean gameDefeat = false;
+    //击杀僵尸数
     private static int num = 0;
 
     public void init(Stage stage) {
@@ -72,7 +73,7 @@ public class StartAdventure {
         //铲子初始化
         shove = new Shove(505, 0, 60, 65);
         startTime = new Date();
-        //草地各自初始化
+        //草地初始化
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 9; j++) {
                 glasses.add(new Glass(46 + 82 * j, 80 + 100 * i, 82, 100));
@@ -93,6 +94,7 @@ public class StartAdventure {
         suns.clear();
         bullets.clear();
         interval = 0;
+        money = 25;
         num = 0;
         game = true;
         gameDefeat = false;
@@ -128,9 +130,9 @@ public class StartAdventure {
         graphicsContext.fillText(String.valueOf(WallNut.PRICE), StartAdventure.CARD_X + 3 * StartAdventure.CARD_SPACE, 75);
         //画卡片
         if (money >= SunFlower.PRICE) {
-            cardPaint(SunFlower.cards, graphicsContext, 0, true);
+            cardPaint(SunFlower.CARDS, graphicsContext, 0, true);
         } else {
-            cardPaint(SunFlower.cards, graphicsContext, 0, false);
+            cardPaint(SunFlower.CARDS, graphicsContext, 0, false);
         }
         if (money >= SnowPea.PRICE) {
             cardPaint(SnowPea.cards, graphicsContext, 1, true);
@@ -143,69 +145,11 @@ public class StartAdventure {
             cardPaint(PeaShooter.cards, graphicsContext, 2, false);
         }
         if (money >= WallNut.PRICE) {
-            cardPaint(WallNut.cards, graphicsContext, 3, true);
+            cardPaint(WallNut.CARDS, graphicsContext, 3, true);
         } else {
-            cardPaint(WallNut.cards, graphicsContext, 3, false);
+            cardPaint(WallNut.CARDS, graphicsContext, 3, false);
         }
-        //每7秒随机出现一个太阳
-        stopTime = new Date();
-        if ((int) (((stopTime.getTime() - startTime.getTime()) * 0.001)) == interval) {
-            System.out.println(interval++);
-//            interval++;
-            if (interval % 9 == 0) {
-                suns.add(new Sun((int) (Math.random() * 680) + 70, (int) (Math.random() * 500) + 50, 50.0, 50));
-            }
-            if (interval >= 1) {//40秒后第一波攻势来袭
-                if (num >= 0 && num <= 5) {
-                    if ((interval >= ((int) (Math.random() * 10) + 10) && interval < 20)) {
-                        zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 6, 10, 200));
-                    }
-                } else if (num > 5 && num <= 25) {
-                    if (interval >= ((int) (Math.random() * 5) + 30)) {
-                        int x = (int) (Math.random() * 16);
-                        if (x < 5 && x >= 0) {
-                            zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 1, 20, 100));
-                        } else if (x >= 5 && x < 11) {
-                            zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                        } else if (x >= 11 && x < 14) {
-                            zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                        } else {
-                            zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                        }
-                    }
-                } else if (num > 25 && num <= 50) {
-                    if (interval >= ((int) (Math.random() * 5) + 40)) {
-                        for (int i = 0; i < 2; i++) {//一下产生两只僵尸
-                            int x = (int) (Math.random() * 16);
-                            if (x < 4 && x >= 0) {
-                                zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 1, 20, 100));
-                            } else if (x >= 4 && x < 11) {
-                                zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                            } else if (x >= 11 && x < 14) {
-                                zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                            } else {
-                                zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                            }
-                        }
-                    }
-                } else if (num > 50) {
-                    if (interval >= 10 + ((int) (Math.random() * 5))) {
-                        for (int i = 0; i < 2; i++) {
-                            int x = (int) (Math.random() * 16);
-                            if (x < 3 && x >= 0) {
-                                zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15, 1, 20, 100));
-                            } else if (x >= 3 && x < 9) {
-                                zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                            } else if (x >= 9 && x < 14) {
-                                zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                            } else {
-                                zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15, 0.8, 15, 200));
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
         //画四种植物
         Collection<Plant> values = plants.values();
         try {
@@ -217,12 +161,13 @@ public class StartAdventure {
         }
 
         //画僵尸
-        Iterator<ZOMBIE> iterator = zombies.iterator();
+        Iterator<Zombie> iterator = zombies.iterator();
         while (iterator.hasNext()) {
-            ZOMBIE zombie = iterator.next();
+            Zombie zombie = iterator.next();
             zombie.paint(graphicsContext);
-            if (!zombie.live){
+            if (!zombie.live) {
                 iterator.remove();
+                num += 1;
             }
         }
 
@@ -239,7 +184,7 @@ public class StartAdventure {
         }
         //画点击卡片后的附着效果
         if (SunFlower.move) {
-            graphicsContext.drawImage(SunFlower.cards[0], x - SunFlower.cards[0].getWidth() / 2, y - SunFlower.cards[0].getHeight() / 2);
+            graphicsContext.drawImage(SunFlower.CARDS[0], x - SunFlower.CARDS[0].getWidth() / 2, y - SunFlower.CARDS[0].getHeight() / 2);
         }
         if (SnowPea.move) {
             graphicsContext.drawImage(SnowPea.cards[0], x - SnowPea.cards[0].getWidth() / 2, y - SnowPea.cards[0].getHeight() / 2);
@@ -248,13 +193,62 @@ public class StartAdventure {
             graphicsContext.drawImage(PeaShooter.cards[0], x - PeaShooter.cards[0].getWidth() / 2, y - PeaShooter.cards[0].getHeight() / 2);
         }
         if (WallNut.move) {
-            graphicsContext.drawImage(WallNut.cards[0], x - WallNut.cards[0].getWidth() / 2, y - WallNut.cards[0].getHeight() / 2);
+            graphicsContext.drawImage(WallNut.CARDS[0], x - WallNut.CARDS[0].getWidth() / 2, y - WallNut.CARDS[0].getHeight() / 2);
         }
         if (Shove.move) {
             graphicsContext.drawImage(Shove.image, x - Shove.image.getWidth() / 2, y - Shove.image.getHeight() / 2);
         }
+
+        //每隔一秒钟执行
+        stopTime = new Date();
+        if ((int) (((stopTime.getTime() - startTime.getTime()) * 0.001)) == interval) {
+            interval++;
+            System.out.println(interval);
+            //每9秒随机出现一个太阳
+            if (interval % 9 == 0) {
+                suns.add(new Sun((int) (Math.random() * 680) + 70, (int) (Math.random() * 500) + 50, 50.0, 50));
+            }
+            if (interval >= 20) {
+                //20秒后第一波攻势来袭
+                if (num >= 0 && num <= 5) { //击杀数小于5个时，每七秒钟生成一个旗帜僵尸
+                    if ((interval % 7 == 0)) {
+                        addZombie(0);
+                    }
+                } else if (num > 5 && num <= 15) {  //击杀数在(5,25]之间时，每五秒生成一个僵尸(旗帜或铁桶）
+                    if (interval % 5 == 0) {
+                        addZombie((int) (Math.random()*2));
+                    }
+                } else if (num > 15 && num <= 30) {
+                    if (interval % 5 == 0) {    //击杀数在(15,30]之间时，每五秒生成两个僵尸(旗帜或铁桶或报纸或橄榄）
+                        addZombie((int) (Math.random()*4));
+                        addZombie((int) (Math.random()*4));
+                    }
+                } else if (num > 30) {      //击杀数超过30，每秒产生一个僵尸
+                    addZombie((int) (Math.random()*4));
+                }
+            }
+        }
     }
 
+    //随机生成一个僵尸
+    private void addZombie(int x){
+        switch (x){
+            case 0:
+                zombies.add(new FlagZombies((int) (Math.random() * 5) * 100 + 15));
+                break;
+            case 1:
+                zombies.add(new BucketheadZombie((int) (Math.random() * 5) * 100 + 15));
+                break;
+            case 2:
+                zombies.add(new NewspaperZombie((int) (Math.random() * 5) * 100 + 15));
+                break;
+            case 3:
+                zombies.add(new FootballZombie((int) (Math.random() * 5) * 100 + 15));
+                break;
+        }
+    }
+
+    //每帧刷新画面
     private class Refresh extends AnimationTimer {
         @Override
         public void handle(long now) {
@@ -265,6 +259,7 @@ public class StartAdventure {
         }
     }
 
+    //画卡片的黑白状态
     private void cardPaint(Image[] cards, GraphicsContext graphicsContext, int index, boolean visible) {
         if (visible) {
             graphicsContext.drawImage(cards[0], StartAdventure.CARD_X + index * StartAdventure.CARD_SPACE, StartAdventure.CARD_Y, cards[0].getWidth(), cards[0].getHeight());
@@ -273,6 +268,7 @@ public class StartAdventure {
         }
     }
 
+    //获取鼠标的位置
     private class MouseMove implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent event) {

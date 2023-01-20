@@ -1,6 +1,5 @@
 package com.biyixia.sprite.zombies;
 
-import com.biyixia.sprite.plants.Plant;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -8,7 +7,7 @@ import javafx.scene.image.Image;
  * @author dbc
  * @create 2023-01-18 19:45
  */
-public class NewspaperZombie extends ZOMBIE {
+public class NewspaperZombie extends Zombie {
     private static final Image[] images = new Image[235];
     private int count = 0;
     private final int max;
@@ -39,9 +38,6 @@ public class NewspaperZombie extends ZOMBIE {
             if (count <= 94 || count >= 133) {
                 count = 94;
             }
-            if (count == 120) {
-                attack();
-            }
         }
         this.setX(getX() - speed);
         graphicsContext.drawImage(images[count], this.getX(), this.getY(), images[count].getWidth(), images[count++].getHeight());
@@ -65,13 +61,6 @@ public class NewspaperZombie extends ZOMBIE {
             }
         }
         graphicsContext.drawImage(images[count], this.getX(), this.getY(), images[count].getWidth(), images[count++].getHeight());
-    }
-
-    private void attack() {
-        Plant plant = getPlant(this.x + 140, this.y + 100);
-        if (plant != null){
-            plant.attacked = true;
-        }
     }
 
     @Override

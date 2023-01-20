@@ -11,12 +11,13 @@ import javafx.scene.image.Image;
  * @create 2023-01-18 10:04
  */
 public class SnowPea extends Plant {
-    public static boolean move = false;
-    public static final int PRICE = 150;
+    //寒冰射手卡片
     public static final Image[] cards = new Image[]{
             new Image("images/GameFrame/back16.png"),
             new Image("images/GameFrame/back17.png")
     };
+    public static boolean move = false;
+    public static final int PRICE = 150;
     private  int count = 0;
     public static final Image[] images = new Image[36];
 
@@ -25,29 +26,19 @@ public class SnowPea extends Plant {
             images[i] = new Image("images/hanbing/hanbing (" + (i + 1) + ").png");
         }
     }
-
-    @Override
-    public void destroy() {
-        super.destroy();
+    public void paint(GraphicsContext graphicsContext) {
+        super.paint(graphicsContext);
     }
 
     @Override
-    public void paint(GraphicsContext graphicsContext) {
-        if (hp > 0) {
-            if (count >= images.length) {
-                count = 0;
-            }
-            graphicsContext.drawImage(images[count++], this.getX(), this.getY());
-            if (attacked){
-                attacked = false;
-                hp -= 25;
-            }
-            //测试发现，发射子弹频率过快会导致上个子弹爆炸声还没放完，第二个子弹已经爆炸因此产生第二个子弹有伤害没声音的现象
-            if (count == 4){
-                StartAdventure.bullets.add(new SnowBullet(this.getX()+50,this.getY()));
-            }
-        }else {
-            destroy();
+    public void work(GraphicsContext graphicsContext) {
+        if (count >= images.length) {
+            count = 0;
+        }
+        graphicsContext.drawImage(images[count++], this.getX(), this.getY());
+        //测试发现，发射子弹频率过快会导致上个子弹爆炸声还没放完，第二个子弹已经爆炸因此产生第二个子弹有伤害没声音的现象
+        if (count == 4){
+            StartAdventure.bullets.add(new SnowBullet(this.getX()+50,this.getY()));
         }
     }
 

@@ -7,7 +7,7 @@ import javafx.scene.image.Image;
  * @author dbc
  * @create 2023-01-18 19:45
  */
-public class FootballZombie extends ZOMBIE {
+public class FootballZombie extends Zombie {
     private  int count = 0;
     private  int max;
     private static Image[] images = new Image[239];
@@ -50,9 +50,15 @@ public class FootballZombie extends ZOMBIE {
             if (count <= 48 || count >= 96) {
                 count = 48;
             }
+            if (count == 60){
+                attack();
+            }
         } else if (hp > 0 && hp <= max / 2) {
             if (count <= 143 || count >= 191){
                 count = 143;
+            }
+            if (count == 170){
+                attack();
             }
         }
         graphicsContext.drawImage(images[count++], this.x, this.y);

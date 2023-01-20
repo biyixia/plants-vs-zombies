@@ -9,7 +9,7 @@ import javafx.scene.media.AudioClip;
  * @author dbc
  * @create 2023-01-18 19:44
  */
-public class BucketheadZombie extends ZOMBIE {
+public class BucketheadZombie extends Zombie {
     private static Image[] images = new Image[239];
     private int max;
     private int count = 0;
@@ -21,7 +21,7 @@ public class BucketheadZombie extends ZOMBIE {
         }
     }
 
-    public BucketheadZombie(Double y) {
+    public BucketheadZombie(int y) {
         super(y, 1, 15, 200);
         this.max = hp;
     }
@@ -57,9 +57,15 @@ public class BucketheadZombie extends ZOMBIE {
             if (count <= 48 || count >= 96) {
                 count = 48;
             }
+            if (count == 70) {
+                attack();
+            }
         } else if (hp > 0 && hp <= max / 2) {
             if (count <= 143 || count >= 191){
                 count = 143;
+            }
+            if (count == 160){
+                attack();
             }
         }
         graphicsContext.drawImage(images[count++], this.x, this.y);

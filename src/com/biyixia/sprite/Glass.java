@@ -1,5 +1,6 @@
 package com.biyixia.sprite;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 /**
@@ -19,16 +20,7 @@ public class Glass extends Sprite{
     }
 
     @Override
-    public String toString() {
-        return "Glass{" +
-                "live=" + live +
-                ", x=" + x +
-                ", y=" + y +
-                '}';
-    }
-
-    @Override
-    public void destroy() {
+    public void paint(GraphicsContext graphicsContext) {
 
     }
 }
