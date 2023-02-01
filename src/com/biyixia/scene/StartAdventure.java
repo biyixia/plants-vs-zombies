@@ -14,12 +14,15 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.AudioClip;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -32,6 +35,17 @@ public class StartAdventure {
     private final GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
     private final AudioClip bgm8 = GameUtil.soundPlay("sounds/bgm8.wav");
     private final AudioClip defeat = GameUtil.soundPlay("sounds/shibai.wav");
+    private static boolean running;
+    private static boolean menuLight;
+    private final Image menuButton = new Image("images/GameFrame/back2.png");
+    private final Image selectedMenu = new Image("images/GameFrame/back3.png");
+    private final Image menu = new Image("images/GameFrame/back8.png");
+    private final Image mainMenu = new Image("images/GameFrame/back9.png");
+    private static boolean selectMainMenu;
+    private final Image restart = new Image("images/GameFrame/back10.png");
+    private static boolean selectGoOn;
+    private final Image goOn = new Image("images/GameFrame/back11.png");
+    private static boolean selectRestart = false;
     private final Refresh refresh = new Refresh();
     private long lastUpdate = 0;
     private final ArrayList<Car> cars = new ArrayList<>();
@@ -47,22 +61,34 @@ public class StartAdventure {
     private static ArrayList<Plant> plantCards = new ArrayList<>();
     private Shove shove = null;
     private static final int CARD_X = 137, CARD_Y = 17, CARD_SPACE = 52;
-    private static Date startTime;
-    private static Date stopTime;
-    private static int interval = 0;
+    private static LocalDateTime startTime;
+    private static LocalDateTime stopTime;
+    public static int interval;
     private final MouseClick mouseClick = new MouseClick();
     private final MouseMove mouseMove = new MouseMove();
-    private static boolean move = false;
-    public static int money = 25;
-    private static double x = 0;
-    private static double y = 0;
-    public static boolean game = false;
-    private static boolean gameDefeat = false;
+    private static boolean move;
+    public static int money;
+    private static double x;
+    private static double y;
+    public static boolean game;
+    private static boolean gameDefeat;
     //击杀僵尸数
     private static int num = 0;
 
     public void init(Stage stage) {
+        //暂停菜单初始化
+        menuLight = false;
+        selectMainMenu = false;
+        selectGoOn = false;
+        selectRestart = false;
+        running = true;
+        //游戏规则初始化
         game = true;
+        gameDefeat = false;
+        interval = 0;
+        money = 25;
+        num = 0;
+        move = false;
         //1.播放bgm
         bgm8.play();
         //2.加载页面
@@ -82,7 +108,7 @@ public class StartAdventure {
         plantCards.add(wallNutCard);
         //铲子初始化
         shove = new Shove(505, 0, 60, 65);
-        startTime = new Date();
+        startTime = LocalDateTime.now();
         //草地初始化
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 9; j++) {
@@ -92,12 +118,16 @@ public class StartAdventure {
     }
 
     public void clear(Stage stage) {
-        interval = 0;
-        money = 25;
-        num = 0;
-        game = true;
-        gameDefeat = false;
+        bgm8.stop();
+        //清空草地上的植物
+        for (Glass glass : glasses) {
+            if (glass.live) {
+                plants.remove(glass);
+            }
+        }
         //清空数组并释放内存
+        plantCards.clear();
+        plantCards.trimToSize();
         glasses.clear();
         glasses.trimToSize();
         cars.clear();
@@ -108,19 +138,9 @@ public class StartAdventure {
         suns.trimToSize();
         bullets.clear();
         bullets.trimToSize();
-        //清空植物
-        for (Glass glass : glasses) {
-            if (glass.live) {
-                plants.remove(glass);
-            }
-        }
     }
 
     private void paint() {
-        //填充画布左侧
-        graphicsContext.setFill(Paint.valueOf("white"));
-        graphicsContext.fillRect(0,0,10,600);
-        graphicsContext.setFill(Paint.valueOf("black"));
         if (!game) {     //游戏失败
             bgm8.stop();
             if (!gameDefeat && !defeat.isPlaying()) {   //不同时播放且只播放一次
@@ -131,8 +151,20 @@ public class StartAdventure {
             return;
         }
 
+        //填充画布左侧
+        graphicsContext.setFill(Paint.valueOf("white"));
+        graphicsContext.fillRect(0, 0, 10, 600);
+        graphicsContext.setFill(Paint.valueOf("black"));
+
         //设置背景图片
         graphicsContext.drawImage(new Image("images/GameFrame/back1.png"), 10, 0);
+
+        //画菜单按钮
+        if (menuLight) {
+            graphicsContext.drawImage(selectedMenu, 0, 0);
+        } else {
+            graphicsContext.drawImage(menuButton, 0, 0);
+        }
 
         //画车
         for (Car car : cars) {
@@ -206,8 +238,8 @@ public class StartAdventure {
         }
 
         //每隔一秒钟执行
-        stopTime = new Date();
-        if ((int) (((stopTime.getTime() - startTime.getTime()) * 0.001)) == interval) {
+        stopTime = LocalDateTime.now();
+        if (startTime.until(stopTime, ChronoUnit.SECONDS) == interval) {
             interval++;
             System.out.println(interval);
             //每9秒随机出现一个太阳
@@ -258,9 +290,21 @@ public class StartAdventure {
     private class Refresh extends AnimationTimer {
         @Override
         public void handle(long now) {
-            if (now - lastUpdate > 20_000_000) {
+            if (running && now - lastUpdate > 20_000_000) {
                 paint();
                 lastUpdate = now;
+            }
+            if (!running) {
+                //画菜单界面
+                if (selectRestart) {
+                    graphicsContext.drawImage(restart, 0, 0);
+                } else if (selectMainMenu) {
+                    graphicsContext.drawImage(mainMenu, 0, 0);
+                } else if (selectGoOn) {
+                    graphicsContext.drawImage(goOn,0,0);
+                } else {
+                    graphicsContext.drawImage(menu, 0, 0);
+                }
             }
         }
     }
@@ -280,92 +324,132 @@ public class StartAdventure {
         public void handle(MouseEvent event) {
             x = event.getX();
             y = event.getY();
+            if (GameUtil.ifRect(x, y, 670, 5, 785, 45)) {
+                menuLight = true;
+            } else {
+                menuLight = false;
+            }
+            if (!running) {
+                if (GameUtil.ifRect(x, y, 280, 300, 500, 350)) {
+                    selectMainMenu = true;
+                }else {
+                    selectMainMenu = false;
+                }
+                if (GameUtil.ifRect(x, y, 280, 355, 500, 400)) {
+                    selectRestart = true;
+                } else {
+                    selectRestart = false;
+                }
+                if (GameUtil.ifRect(x, y, 280, 430, 500, 500)) {
+                    selectGoOn = true;
+                } else {
+                    selectGoOn = false;
+                }
+            }
         }
     }
 
     private class MouseClick implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent event) {
-            //游戏结束
-            if (!game) {
-                Director.getInstance().toMenu();
-            }
-            //检测是否点击太阳
-            for (Sun sun : suns) {
-                if (sun.live && GameUtil.ifRect(event.getX(), event.getY(), sun.getX(), sun.getY(), sun.getX() + sun.getWidth(), sun.getY() + sun.getHeight())) {
-                    GameUtil.soundPlay("sounds/yangguang.wav").play();
-                    sun.move = true;
-                    sun.setSpeedx((sun.getX() - 70) / 30);
-                    sun.setSpeedy((sun.getY() - 11) / 30);
+            if (running) {
+                //游戏结束
+                if (!game) {
+                    Director.getInstance().toMenu();
                 }
-            }
-            //点击卡片或铲子，移动卡片或铲子
-            if (!move) {
-                if (!Shove.move && GameUtil.ifRect(event.getX(), event.getY(), shove.getX(), shove.getY(), shove.getX() + shove.getWidth(), shove.getY() + shove.getHeight())) {
-                    GameUtil.soundPlay("sounds/moveshove.wav").play();
-                    Shove.move = true;
-                    move = true;
+                //点击菜单暂停游戏并弹出菜单界面
+                if (menuLight) {
+                    running = false;
                 }
-                for (int i = 0; i < 4; i++) {
-                    if (GameUtil.ifRect(event.getX(), event.getY(), CARD_X + CARD_SPACE * i, CARD_Y, CARD_X + 39 + CARD_SPACE * i, CARD_Y + 45)) {
-                        Plant card = null;
-                        switch (i) {
-                            case 0:
-                                card = plantCards.get(0);
-                                break;
-                            case 1:
-                                card = plantCards.get(1);
-                                break;
-                            case 2:
-                                card = plantCards.get(2);
-                                break;
-                            case 3:
-                                card = plantCards.get(3);
-                                break;
-                        }
-                        if (money >= card.getPrice()) {
-                            card.setMove(true);
-                            GameUtil.soundPlay("sounds/plant.wav").play();
-                            move = true;
-                        }
+                //检测是否点击太阳
+                for (Sun sun : suns) {
+                    if (sun.live && GameUtil.ifRect(event.getX(), event.getY(), sun.getX(), sun.getY(), sun.getX() + sun.getWidth(), sun.getY() + sun.getHeight())) {
+                        GameUtil.soundPlay("sounds/yangguang.wav").play();
+                        sun.move = true;
+                        sun.setSpeedx((sun.getX() - 70) / 30);
+                        sun.setSpeedy((sun.getY() - 11) / 30);
                     }
                 }
-            } else {    //已经点击卡片或铲子
-                //使用卡片或铲子
-                for (Plant plantCard : plantCards) {
-                    if (plantCard.getMove()) {
-                        for (Glass glass : glasses) {
-                            //放置植物
-                            if (!glass.live && GameUtil.ifRect(event.getX(), event.getY(), glass.getX(),
-                                    glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())) {
-                                GameUtil.soundPlay("sounds/plant.wav").play();
-                                money -= plantCard.getPrice();
-                                glass.live = true;
-                                if (plantCard instanceof SunFlower) {
-                                    plants.put(glass, new SunFlower(glass.getX(), glass.getY(), 73, 74));
-                                } else if (plantCard instanceof WallNut) {
-                                    plants.put(glass, new WallNut(glass.getX(), glass.getY(), 73, 74));
-                                } else if (plantCard instanceof SnowPea) {
-                                    plants.put(glass, new SnowPea(glass.getX(), glass.getY(), 73, 74));
-                                } else if (plantCard instanceof PeaShooter) {
-                                    plants.put(glass, new PeaShooter(glass.getX(), glass.getY(), 73, 74));
-                                }
+                //点击卡片或铲子，移动卡片或铲子
+                if (!move) {
+                    if (!Shove.move && GameUtil.ifRect(event.getX(), event.getY(), shove.getX(), shove.getY(), shove.getX() + shove.getWidth(), shove.getY() + shove.getHeight())) {
+                        GameUtil.soundPlay("sounds/moveshove.wav").play();
+                        Shove.move = true;
+                        move = true;
+                    }
+                    for (int i = 0; i < 4; i++) {
+                        if (GameUtil.ifRect(event.getX(), event.getY(), CARD_X + CARD_SPACE * i, CARD_Y, CARD_X + 39 + CARD_SPACE * i, CARD_Y + 45)) {
+                            Plant card = null;
+                            switch (i) {
+                                case 0:
+                                    card = plantCards.get(0);
+                                    break;
+                                case 1:
+                                    card = plantCards.get(1);
+                                    break;
+                                case 2:
+                                    card = plantCards.get(2);
+                                    break;
+                                case 3:
+                                    card = plantCards.get(3);
+                                    break;
                             }
-                        }//点击不在草地内也取消卡片的跟随
-                        plantCard.setMove(false);
+                            if (money >= card.getPrice()) {
+                                card.setMove(true);
+                                GameUtil.soundPlay("sounds/plant.wav").play();
+                                move = true;
+                            }
+                        }
+                    }
+                } else {    //已经点击卡片或铲子
+                    if (Shove.move) {
+                        for (Glass glass : glasses) {
+                            if (glass.live && GameUtil.ifRect(event.getX(), event.getY(), glass.getX(),
+                                    glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())) {
+                                glass.live = false;
+                                plants.remove(glass);
+                            }
+                        }//铲子点击在草地外或点击的草地没有元素取消铲子的跟随
+                        Shove.move = false;
                         move = false;
                     }
-                }
-                if (Shove.move) {
-                    for (Glass glass : glasses) {
-                        if (glass.live && GameUtil.ifRect(event.getX(), event.getY(), glass.getX(),
-                                glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())) {
-                            glass.live = false;
-                            plants.remove(glass);
+                    //使用卡片或铲子
+                    for (Plant plantCard : plantCards) {
+                        if (plantCard.getMove()) {
+                            for (Glass glass : glasses) {
+                                //放置植物
+                                if (!glass.live && GameUtil.ifRect(event.getX(), event.getY(), glass.getX(),
+                                        glass.getY(), glass.getX() + glass.getWidth(), glass.getY() + glass.getHeight())) {
+                                    GameUtil.soundPlay("sounds/plant.wav").play();
+                                    money -= plantCard.getPrice();
+                                    glass.live = true;
+                                    if (plantCard instanceof SunFlower) {
+                                        plants.put(glass, new SunFlower(glass.getX(), glass.getY(), 73, 74));
+                                    } else if (plantCard instanceof WallNut) {
+                                        plants.put(glass, new WallNut(glass.getX(), glass.getY(), 73, 74));
+                                    } else if (plantCard instanceof SnowPea) {
+                                        plants.put(glass, new SnowPea(glass.getX(), glass.getY(), 73, 74));
+                                    } else if (plantCard instanceof PeaShooter) {
+                                        plants.put(glass, new PeaShooter(glass.getX(), glass.getY(), 73, 74));
+                                    }
+                                }
+                            }//点击不在草地内也取消卡片的跟随
+                            plantCard.setMove(false);
+                            move = false;
                         }
-                    }//铲子点击在草地外或点击的草地没有元素取消铲子的跟随
-                    Shove.move = false;
-                    move = false;
+                    }
+                }
+            } else {
+                if (selectRestart) {
+                    Director.getInstance().toStartAdventure();
+                }
+                if (selectMainMenu) {
+                    Director.getInstance().toMenu();
+                }
+                if (selectGoOn){
+                    startTime = LocalDateTime.now().minus(interval-1,ChronoUnit.SECONDS);
+                    selectGoOn = false;
+                    running = true;
                 }
             }
         }

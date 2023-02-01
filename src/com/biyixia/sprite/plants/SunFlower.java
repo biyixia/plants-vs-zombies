@@ -20,7 +20,7 @@ public class SunFlower extends Plant {
     public static boolean move = false;
     public static final int PRICE = 25;
     private int count = 0;
-    private Date startTime = new Date();
+    private int startTime = StartAdventure.interval;
     private static final Image[] images = new Image[36];
     private boolean first = false;
 
@@ -52,17 +52,17 @@ public class SunFlower extends Plant {
     }
 
     private void createSun() {
-        Date stopTime = new Date();
+        int stopTime = StartAdventure.interval;
         //太阳花首次产生太阳的时间是6秒
-        if ((!first && (stopTime.getTime() - startTime.getTime()) * 0.001 > 6)) {
+        if (!first && (stopTime - startTime > 6)) {
             first = true;
             StartAdventure.suns.add(new Sun(this.getX(), this.getY()));
-            startTime = new Date();
+            startTime = StartAdventure.interval;
         }
         //此后每20秒生产一个太阳
-        if ((stopTime.getTime() - startTime.getTime()) * 0.001 > 20) {
+        if ((stopTime - startTime) > 20) {
             StartAdventure.suns.add(new Sun(this.getX(), this.getY()));
-            startTime = new Date();
+            startTime = StartAdventure.interval;
         }
     }
 

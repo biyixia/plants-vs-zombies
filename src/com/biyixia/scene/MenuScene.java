@@ -155,7 +155,6 @@ public class MenuScene {
             }else if(GameUtil.ifRect((int) event.getX(),(int) event.getY(),734,522,785,540)){//Quit
 
             }else if(GameUtil.ifRect((int) event.getX(),(int) event.getY(),460,120,459,200,740,250,752,150)){//开始冒险
-                GameUtil.soundPlay("sounds/bgm7.wav").play();
                 Director.getInstance().toStartAdventure();
             }else if(GameUtil.ifRect((int) event.getX(),(int) event.getY(),461,208,460,273,719,320,737,258)){//mini模式
 

@@ -36,7 +36,7 @@ public class Director {
         stage.setResizable(false);
         stage.setScene(scene);
         this.stage = stage;
-        toStartAdventure();
+        toLoad();
         stage.show();
     }
 
@@ -51,7 +51,9 @@ public class Director {
     }
 
     public void toStartAdventure(){
+        GameUtil.soundPlay("sounds/bgm7.wav").play();
         menuScene.clear(stage);
+        startAdventure.clear(stage);
         startAdventure.init(stage);
     }
 }

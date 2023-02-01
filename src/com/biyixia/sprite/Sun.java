@@ -4,6 +4,7 @@ import com.biyixia.scene.StartAdventure;
 import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+
 import java.util.Date;
 
 /**
@@ -15,8 +16,8 @@ public class Sun extends Sprite {
     public boolean live = true;
     private int count = 0;
     public boolean move = false;
-    private Date startTime = new Date();
-    private Date stopTime;
+    private int startTime = StartAdventure.interval;
+    private int stopTime;
     double speedx, speedy;//阳光被收集后的移动速度
     double maxY;
 
@@ -61,8 +62,8 @@ public class Sun extends Sprite {
                 this.y += 11;//阳光掉落y值增长
             }
             if (this.y >= this.maxY) {
-                stopTime = new Date();
-                if ((stopTime.getTime() - startTime.getTime()) * 0.001 > 3) {
+                stopTime = StartAdventure.interval;
+                if ((stopTime - startTime) > 3) {
                     live = false;
                 }
             }
