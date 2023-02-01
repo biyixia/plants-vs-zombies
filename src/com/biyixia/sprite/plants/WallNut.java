@@ -47,8 +47,30 @@ public class WallNut extends Plant {
         graphicsContext.drawImage(images[count++], this.getX(), this.getY());
     }
 
+    public WallNut() {
+    }
+
     public WallNut(double x, double y, double width, double height) {
         super(x, y, width, height);
         this.hp = 300;
+    }
+
+    @Override
+    public int getPrice() {
+        return PRICE;
+    }
+
+    @Override
+    public boolean getMove() {
+        return move;
+    }
+    @Override
+    public void setMove(boolean b) {
+        move = b;
+    }
+
+    @Override
+    public Image[] getCards() {
+        return CARDS;
     }
 }

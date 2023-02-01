@@ -36,7 +36,7 @@ public class Director {
         stage.setResizable(false);
         stage.setScene(scene);
         this.stage = stage;
-        toLoad();
+        toStartAdventure();
         stage.show();
     }
 

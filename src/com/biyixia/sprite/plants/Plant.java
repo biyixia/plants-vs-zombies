@@ -3,7 +3,6 @@ package com.biyixia.sprite.plants;
 import com.biyixia.scene.StartAdventure;
 import com.biyixia.sprite.Glass;
 import com.biyixia.sprite.Sprite;
-import com.biyixia.utils.GameUtil;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -19,6 +18,10 @@ public abstract class Plant extends Sprite {
 
     public Plant(double x, double y, double width, double height) {
         super(x, y, width, height);
+    }
+
+    public Plant() {
+
     }
 
     @Override
@@ -40,6 +43,9 @@ public abstract class Plant extends Sprite {
         }
     }
 
+    public abstract int getPrice();
+    public abstract boolean getMove();
+
     @Override
     public void destroy() {
         for (Glass glass : StartAdventure.glasses) {
@@ -50,4 +56,7 @@ public abstract class Plant extends Sprite {
             }
         }
     }
+
+    public abstract void setMove(boolean b);
+    public abstract Image[] getCards();
 }

@@ -34,6 +34,9 @@ public class SunFlower extends Plant {
         super(x, y, width, height);
     }
 
+    public SunFlower() {
+        super();
+    }
 
     public void paint(GraphicsContext graphicsContext) {
         super.paint(graphicsContext);
@@ -61,5 +64,24 @@ public class SunFlower extends Plant {
             StartAdventure.suns.add(new Sun(this.getX(), this.getY()));
             startTime = new Date();
         }
+    }
+
+    @Override
+    public int getPrice() {
+        return PRICE;
+    }
+
+    @Override
+    public boolean getMove() {
+        return move;
+    }
+    @Override
+    public void setMove(boolean b) {
+        move = b;
+    }
+
+    @Override
+    public Image[] getCards() {
+        return CARDS;
     }
 }

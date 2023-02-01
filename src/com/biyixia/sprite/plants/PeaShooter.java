@@ -11,7 +11,7 @@ import javafx.scene.image.Image;
  */
 public class PeaShooter extends Plant {
     //豌豆射手卡片
-    public static final Image[] cards = new Image[]{
+    public static final Image[] CARDS = new Image[]{
             new Image("images/GameFrame/back14.png"),
             new Image("images/GameFrame/back15.png")
     };
@@ -23,6 +23,9 @@ public class PeaShooter extends Plant {
         for (int i = 0; i < images.length; i++) {
             images[i] = new Image("images/wandou/wandou (" + (i + 1) + ").png");
         }
+    }
+
+    public PeaShooter() {
     }
 
     public PeaShooter(double x, double y, double width, double height) {
@@ -43,5 +46,25 @@ public class PeaShooter extends Plant {
             StartAdventure.bullets.add(new Bullet(this.getX() + 50, this.getY()));
         }
         graphicsContext.drawImage(images[count++], this.getX(), this.getY());
+    }
+
+    @Override
+    public int getPrice() {
+        return PRICE;
+    }
+
+    @Override
+    public boolean getMove() {
+        return move;
+    }
+
+    @Override
+    public void setMove(boolean b) {
+        move = b;
+    }
+
+    @Override
+    public Image[] getCards() {
+        return CARDS;
     }
 }

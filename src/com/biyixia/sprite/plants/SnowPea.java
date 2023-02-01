@@ -1,7 +1,6 @@
 package com.biyixia.sprite.plants;
 
 import com.biyixia.scene.StartAdventure;
-import com.biyixia.sprite.bullet.Bullet;
 import com.biyixia.sprite.bullet.SnowBullet;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -12,7 +11,7 @@ import javafx.scene.image.Image;
  */
 public class SnowPea extends Plant {
     //寒冰射手卡片
-    public static final Image[] cards = new Image[]{
+    public static final Image[] CARDS = new Image[]{
             new Image("images/GameFrame/back16.png"),
             new Image("images/GameFrame/back17.png")
     };
@@ -42,7 +41,29 @@ public class SnowPea extends Plant {
         }
     }
 
+    public SnowPea() {
+    }
+
     public SnowPea(double x, double y, double width, double height) {
         super(x, y, width, height);
+    }
+
+    @Override
+    public int getPrice() {
+        return PRICE;
+    }
+
+    @Override
+    public boolean getMove() {
+        return move;
+    }
+    @Override
+    public void setMove(boolean b) {
+        move = b;
+    }
+
+    @Override
+    public Image[] getCards() {
+        return CARDS;
     }
 }
